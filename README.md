@@ -1,10 +1,20 @@
 # AnalyticsApp
 Application for analyzing expenses and income
 ## Key features:
+
 * Storing user-entered data on expenses and income
 * Ordering data from oldest to newest
 * Create charts to analyze spending by category
 * Plotting charts for different periods
+## Technologies:
+
+* Jetpack Compose
+* Room
+* Navigation Compose
+* ViewModel
+* JetChart
+
+  
 ## Screens
 
 ### _Main Screen_
