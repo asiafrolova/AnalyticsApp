@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Мои расходы</string>
+    <string name="Add">Добавить</string>
+    <string name="Cancel">Отмена</string>
+    <string name="Sum">Сумма</string>
+    <string name="Ok">Ок</string>
+    <string name="Category">Категория</string>
+    <string name="Description">Описание</string>
+    <string name="Date">Дата</string>
+    <string name="Back">Назад</string>
+    <string name="Select_period">Выбрать период</string>
+    <string name="Other">Другое</string>
+</resources>
