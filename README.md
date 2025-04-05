@@ -19,7 +19,9 @@ Application for analyzing expenses and income
 
 ### _Main Screen_
 
-You can click on any entry to see full details.
+You can click on any note to see full details.
+
+Long press will display an alert dialog to delete the note.
 
 ![Main_Screen](https://github.com/asiafrolova/AnalyticsApp/blob/master/docs/main_screen.jpg)
 ### _Add new notes_
