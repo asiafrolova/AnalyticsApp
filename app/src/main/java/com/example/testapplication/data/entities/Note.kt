@@ -36,7 +36,12 @@ class Note {
 
         this.category=if (category.length>0) category.trim(' ') else "Другое"
         this.description=description.trim(' ')
-        this.sum=if (sum.length>0) sum.toLong() else 0
+        try {
+            this.sum=sum.toLong()
+        }catch (e:Exception){
+            this.sum=0
+        }
+
     }
 
 
