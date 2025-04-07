@@ -10,4 +10,5 @@
     <string name="Back">Назад</string>
     <string name="Select_period">Выбрать период</string>
     <string name="Other">Другое</string>
+    <string name="export">Экспорт в  Exel</string>
 </resources>

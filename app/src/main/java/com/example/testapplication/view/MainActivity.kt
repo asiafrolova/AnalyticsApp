@@ -21,6 +21,7 @@ import com.example.testapplication.data.NoteViewModel
 @Suppress("UNCHECKED_CAST")
 class NoteViewModelFactory(val application: Application):ViewModelProvider.Factory{
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
+
         return NoteViewModel(application) as T
     }
 

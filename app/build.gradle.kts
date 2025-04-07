@@ -92,6 +92,16 @@ dependencies {
     //Charts
     implementation (libs.jetchart)
 
+    //Export to Exel
+    implementation(libs.poi)
+    implementation(libs.poi.ooxml)
+
+    //Hilt
+    implementation("com.google.dagger:hilt-android:2.49")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.navigation:navigation-compose:2.8.0")
+    ksp("com.google.dagger:hilt-compiler:2.48")
+
 
 
 }

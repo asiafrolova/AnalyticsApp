@@ -1,12 +1,15 @@
 package com.example.testapplication.data
 
 import android.app.Application
+import android.content.Intent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.testapplication.BuildConfig
 import com.example.testapplication.data.entities.CategorySum
 import com.example.testapplication.data.entities.DaySum
 import com.example.testapplication.data.entities.MonthSum
@@ -16,8 +19,21 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.apache.poi.ss.usermodel.FillPatternType
+import org.apache.poi.ss.usermodel.HorizontalAlignment
+import org.apache.poi.ss.usermodel.IndexedColors
+import org.apache.poi.ss.usermodel.VerticalAlignment
+import org.apache.poi.xssf.usermodel.XSSFCellStyle
+import org.apache.poi.xssf.usermodel.XSSFFont
+import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import java.io.File
+import java.io.FileOutputStream
+import java.lang.reflect.Field
+
 
 class NoteViewModel(application:Application):ViewModel() {
+
     //Список всех note
     val noteList:LiveData<List<Note>>
     //Список note относящихся к сегодняшней дате
@@ -54,9 +70,10 @@ class NoteViewModel(application:Application):ViewModel() {
     private  val _SumYearIncome =MutableStateFlow<List<YearSum>>(arrayListOf())
     val SumYearIncome get() = _SumYearIncome.asStateFlow()
 
-
+    var baseApplication:Application = application
 
     init{
+
         val noteDb = NoteRoomDatabase.getInstance(application)
         val noteDao = noteDb.noteDao()
         repository = NoteRepository(noteDao)
@@ -118,4 +135,137 @@ class NoteViewModel(application:Application):ViewModel() {
             _SumDayIncome.value=repository.getDaySumIncome(datePattern)
         }
     }
+
+    //Функция экспорта в Exel
+    suspend fun exportToExcel() {
+        try {
+
+            val workbook = XSSFWorkbook()
+            val folder = File(baseApplication.filesDir, "exported_files")
+            //проверка существует ли папка
+            if (!folder.exists()) {
+                folder.mkdirs()
+            }
+            exportNotes(workbook)
+            val file = File(folder, "notes.xlsx")
+            try {
+                //запись workbook в файл
+                withContext(Dispatchers.IO) {
+                    FileOutputStream(file).use { outputStream ->
+                        workbook.write(outputStream)
+                    }
+
+                    //Получение uri файла
+                    val fileUri = FileProvider.getUriForFile(
+                        baseApplication.applicationContext,
+                        BuildConfig.APPLICATION_ID + ".fileprovider",
+                        file
+                    )
+
+                    //Открытик файла
+                    val viewIntent = Intent(Intent.ACTION_VIEW).apply {
+                        setDataAndType(fileUri, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+
+
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        putExtra(Intent.EXTRA_STREAM, fileUri)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+
+                    val chooserIntent =
+                        Intent.createChooser(
+                            shareIntent,
+                            "Open or Share File"
+                        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+
+
+                    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(viewIntent))
+
+                    baseApplication.startActivity(chooserIntent)
+
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    suspend fun exportNotes(workbook: XSSFWorkbook) {
+        val sheet = workbook.createSheet("Notes")
+
+        //Имена полей для экспорта
+        val preferredNoteFields = arrayOf(
+            "dateStr",
+            "category",
+            "description",
+            "sum"
+        )
+
+        //Все поля класса Note
+        val allNoteFields = Note::class.java.declaredFields
+        //Фильтрация полей для экспорта
+        val noteFieldsToExport = arrayOfNulls<Field>(preferredNoteFields.size)
+
+        for (i in preferredNoteFields.indices) {
+            for (field in allNoteFields) {
+                if (field.name == preferredNoteFields[i]) {
+                    field.isAccessible = true
+                    noteFieldsToExport[i] = field
+                    break
+                }
+            }
+        }
+
+        // добавления заголовков
+        val headerRow = sheet.createRow(0)
+        val headerStyle = createHeaderStyle(workbook)
+        for (i in noteFieldsToExport.indices) {
+            val cell = headerRow.createCell(i)
+            cell.setCellValue(noteFieldsToExport[i]?.name)
+            cell.cellStyle = headerStyle
+        }
+
+
+        val notes:List<Note> = repository.noteList.value?: listOf()
+        var rowNum = 1
+        for (note in notes) {
+            val row = sheet.createRow(rowNum++)
+            for (i in noteFieldsToExport.indices) {
+                try {
+
+                    val value = noteFieldsToExport[i]?.get(note)
+                    row.createCell(i).setCellValue(value.toString())
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
+    }
+    fun createHeaderStyle(workbook: XSSFWorkbook): XSSFCellStyle {
+        // Создание заголовка
+        val headerStyle: XSSFCellStyle = workbook.createCellStyle()
+
+        // Установка цвета фона
+        headerStyle.fillForegroundColor = IndexedColors.LIGHT_BLUE.index
+        headerStyle.fillPattern = FillPatternType.SOLID_FOREGROUND
+
+        // Установка цвета шрифта
+        val font: XSSFFont = workbook.createFont()
+        font.bold = true
+        font.color = IndexedColors.WHITE.index
+        headerStyle.setFont(font)
+
+        // Уставнока ориентации
+        headerStyle.alignment = HorizontalAlignment.CENTER
+        headerStyle.verticalAlignment = VerticalAlignment.CENTER
+
+        return headerStyle
+    }
+
 }
