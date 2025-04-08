@@ -2,6 +2,8 @@ package com.example.testapplication.view
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -59,6 +61,8 @@ import com.example.testapplication.ui.theme.White
 import com.example.testapplication.ui.theme.jost
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.apache.poi.ss.usermodel.WorkbookFactory
+import org.apache.poi.xdgf.util.Util
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -67,30 +71,6 @@ import kotlin.math.max
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun StatisticsScreen(vm: NoteViewModel = viewModel(),navController: NavController,pattern:String?="__.__.____"){
-    //Переменные для анимации загрузки и экспорт данных в exel
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-    var isCircularIndicatorShowing by remember { mutableStateOf(false) }
-    val snackbarHostState = remember { SnackbarHostState() }
-    val requestStoragePermission = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            coroutineScope.launch {
-                isCircularIndicatorShowing = true
-                delay(3000)
-                vm.exportToExcel()
-                isCircularIndicatorShowing = false
-            }
-        } else {
-            coroutineScope.launch {
-                snackbarHostState.showSnackbar(
-                    message = "This feature is unavailable because it requires access to the phone's storage",
-                    duration = SnackbarDuration.Long
-                )
-            }
-        }
-    }
 
     //Получение данных в отдельном потоке по категориям трат за определенный период
    val filteredCategoriesSumSpend by vm.allNotesSumCategoriesSpend.collectAsState()
@@ -110,22 +90,7 @@ fun StatisticsScreen(vm: NoteViewModel = viewModel(),navController: NavControlle
 
     val daySumSpend by vm.SumDaySpend.collectAsState()
     val daySumIncome by vm.SumDayIncome.collectAsState()
-    //Анимация загрузки
-    Scaffold (snackbarHost = {SnackbarHost(snackbarHostState)}) {
-        if (isCircularIndicatorShowing) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(0.5f),
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
-                    strokeWidth = 2.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-    }
+
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -247,7 +212,7 @@ fun StatisticsScreen(vm: NoteViewModel = viewModel(),navController: NavControlle
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
                         TextButton(shape = RoundedCornerShape(20.dp),
                             modifier = Modifier
-                                .padding(top = 20.dp,bottom=10.dp)
+                                .padding(top = 20.dp, bottom = 40.dp)
                                 .shadow(7.dp, RoundedCornerShape(20.dp))
                                 ,
                             onClick = { navController.navigate("MainScreen/${3}") },
@@ -262,50 +227,17 @@ fun StatisticsScreen(vm: NoteViewModel = viewModel(),navController: NavControlle
                             Text(stringResource(R.string.Select_period), modifier = Modifier.padding(10.dp), fontSize = 20.sp, fontFamily = jost)
                         }
                     }
-                    //Кнопка для экспорта данных в формат Exel
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center){
-                        TextButton(shape = RoundedCornerShape(20.dp),
-                            modifier = Modifier
-                                .padding(bottom = 20.dp)
-                                .shadow(7.dp, RoundedCornerShape(20.dp))
-                            ,
-                            onClick = {
-                                when(PackageManager.PERMISSION_GRANTED){
-                                    ContextCompat.checkSelfPermission(context,
-                                        android.Manifest.permission.WRITE_EXTERNAL_STORAGE)->{
-                                            coroutineScope.launch {
-                                                isCircularIndicatorShowing = true
-                                                delay(3000)
-                                                vm.exportToExcel()
-                                            }.invokeOnCompletion {
-                                                isCircularIndicatorShowing = false
-                                            }
-                                        }
-                                    else->{
-                                        requestStoragePermission.launch(
-                                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                                        )
-                                    }
-                                }
 
 
 
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = White,
-                                disabledContainerColor = VeryWhiteYellowGreen,
-                                contentColor = GreyGreen,
-                                disabledContentColor = Black
-                            )
-                        )
-                        {
-                            Text(stringResource(R.string.export), modifier = Modifier.padding(10.dp), fontSize = 20.sp, fontFamily = jost)
-                        }
-                    }
                     }
                 }
         }
     }
+
+
+
+
 //Вычисление масштаба отображения столбчатой диаграммы в зависимости от максимального значения
 fun CalculateHeight(data:List<List<SumInterface>>):Float{
     var maxSum=1

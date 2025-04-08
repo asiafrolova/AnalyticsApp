@@ -11,4 +11,8 @@
     <string name="Select_period">Выбрать период</string>
     <string name="Other">Другое</string>
     <string name="export">Экспорт в  Exel</string>
+    <string name="import_excel">"Загрузить копию данных из Excel"</string>
+    <string name="export_excel">Экспорт данных в Excel</string>
+    <string name="error_storage">Эта функция недоступна, так как для нее требуется доступ к памяти телефона.</string>
+    <string name="error">Произошла ошибка</string>
 </resources>

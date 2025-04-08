@@ -2,6 +2,8 @@ package com.example.testapplication.data
 
 import android.app.Application
 import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,15 +17,18 @@ import com.example.testapplication.data.entities.DaySum
 import com.example.testapplication.data.entities.MonthSum
 import com.example.testapplication.data.entities.Note
 import com.example.testapplication.data.entities.YearSum
+import com.graphbuilder.math.AddNode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.HorizontalAlignment
 import org.apache.poi.ss.usermodel.IndexedColors
 import org.apache.poi.ss.usermodel.VerticalAlignment
+import org.apache.poi.ss.usermodel.WorkbookFactory
 import org.apache.poi.xssf.usermodel.XSSFCellStyle
 import org.apache.poi.xssf.usermodel.XSSFFont
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -246,6 +251,41 @@ class NoteViewModel(application:Application):ViewModel() {
             }
         }
 
+    }
+    //Загрузка резервной копии из excel
+    fun importFromExcel(uri:Uri):Boolean{
+
+        try {
+            val inputStream = baseApplication.contentResolver.openInputStream(uri)
+            val workbook = WorkbookFactory.create(inputStream)
+            for (sheet in workbook) {
+                if (sheet.sheetName == "Notes") {
+                    for (row in sheet) {
+                        if (row.rowNum == 0) {
+                            continue
+                        }
+                        if (row.getCell(0) == null || row.getCell(0).cellType == CellType.BLANK) {
+                            break
+                        }
+                        val dateStr = row.getCell(0).stringCellValue
+                        val category = row.getCell(1).stringCellValue
+                        val description = row.getCell(2).stringCellValue
+                        val sum = row.getCell(3).stringCellValue
+                        repository.addNote(
+                            Note(
+                                date = dateStr,
+                                category = category,
+                                description = description,
+                                sum = sum
+                            )
+                        )
+                    }
+                }
+            }
+            return true
+        }catch (e:Exception){
+            return false
+        }
     }
     fun createHeaderStyle(workbook: XSSFWorkbook): XSSFCellStyle {
         // Создание заголовка
