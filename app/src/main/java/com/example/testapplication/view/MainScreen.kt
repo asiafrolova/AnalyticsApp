@@ -140,7 +140,6 @@ fun MainScreen(navController: NavController, vm: NoteViewModel = viewModel(), in
                 }
 
             } catch (e: Exception) {
-                //TODO
                 showSnackbar=true
 
             }
