@@ -15,4 +15,7 @@
     <string name="export_excel">Экспорт данных в Excel</string>
     <string name="error_storage">Эта функция недоступна, так как для нее требуется доступ к памяти телефона.</string>
     <string name="error">Произошла ошибка</string>
+    <string name="year">Год</string>
+    <string name="month">Месяц</string>
+    <string name="day">День</string>
 </resources>

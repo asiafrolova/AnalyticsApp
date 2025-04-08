@@ -1,14 +1,8 @@
 package com.example.testapplication.view
 
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.util.Log
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,35 +12,20 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.testapplication.R
@@ -59,10 +38,6 @@ import com.example.testapplication.ui.theme.GreyGreen
 import com.example.testapplication.ui.theme.VeryWhiteYellowGreen
 import com.example.testapplication.ui.theme.White
 import com.example.testapplication.ui.theme.jost
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.apache.poi.ss.usermodel.WorkbookFactory
-import org.apache.poi.xdgf.util.Util
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -100,7 +75,7 @@ fun StatisticsScreen(vm: NoteViewModel = viewModel(),navController: NavControlle
     ) {
 
         //Если в паттерне не указан год/месяц/день получения данных по годам/месяцам/дням
-        var mode:String=""
+        var mode=""
         if(pattern?.subSequence(6,10)=="____"){
             LaunchedEffect(Unit) {
                 vm.getSumInYearSpend(pattern)

@@ -119,7 +119,7 @@ fun SelectPeriod(vm:NoteViewModel= viewModel(),navController: NavController){
                             .onGloballyPositioned { coordinates ->
                                 textfieldSizeYear = coordinates.size.toSize()
                             },
-                        label = { Text("Year", fontFamily = jost) },
+                        label = { Text(stringResource(R.string.year), fontFamily = jost) },
                         trailingIcon = {
                             Icon(iconYear, "contentDescription",
                                 Modifier.clickable { expandedYear = !expandedYear })
@@ -166,7 +166,7 @@ fun SelectPeriod(vm:NoteViewModel= viewModel(),navController: NavController){
                             .onGloballyPositioned { coordinates ->
                                 textfieldSizeMonth = coordinates.size.toSize()
                             },
-                        label = { Text("Month", fontFamily = jost) },
+                        label = { Text(stringResource(R.string.month), fontFamily = jost) },
                         trailingIcon = {
                             Icon(iconMonth, "contentDescription",
                                 Modifier.clickable { expandedMonth = !expandedMonth })
@@ -210,7 +210,7 @@ fun SelectPeriod(vm:NoteViewModel= viewModel(),navController: NavController){
                             .onGloballyPositioned { coordinates ->
                                 textfieldSizeDay = coordinates.size.toSize()
                             },
-                        label = { Text("Day", fontFamily = jost) },
+                        label = { Text(stringResource(R.string.day), fontFamily = jost) },
                         trailingIcon = {
                             Icon(iconDay, "contentDescription",
                                 Modifier.clickable { expandedDay = !expandedDay })
@@ -251,7 +251,8 @@ fun SelectPeriod(vm:NoteViewModel= viewModel(),navController: NavController){
                 },
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
-                    .padding(vertical = 20.dp).shadow(7.dp, RoundedCornerShape(20.dp)),
+                    .padding(vertical = 20.dp)
+                    .shadow(7.dp, RoundedCornerShape(20.dp)),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = White,
                     disabledContainerColor = VeryWhiteYellowGreen,

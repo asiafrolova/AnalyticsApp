@@ -12,6 +12,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
+
         applicationId = "com.example.testapplication"
         minSdk = 28
         targetSdk = 34
@@ -22,6 +23,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
     }
 
     buildTypes {
@@ -97,10 +99,10 @@ dependencies {
     implementation(libs.poi.ooxml)
 
     //Hilt
-    implementation("com.google.dagger:hilt-android:2.49")
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation("androidx.navigation:navigation-compose:2.8.0")
-    ksp("com.google.dagger:hilt-compiler:2.48")
+//    implementation(libs.hilt.android)
+//    implementation(libs.androidx.hilt.navigation.compose)
+//    implementation(libs.androidx.navigation.compose)
+//    ksp(libs.hilt.compiler)
 
 
 

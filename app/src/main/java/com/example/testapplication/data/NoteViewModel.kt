@@ -3,7 +3,6 @@ package com.example.testapplication.data
 import android.app.Application
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -17,7 +16,6 @@ import com.example.testapplication.data.entities.DaySum
 import com.example.testapplication.data.entities.MonthSum
 import com.example.testapplication.data.entities.Note
 import com.example.testapplication.data.entities.YearSum
-import com.graphbuilder.math.AddNode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -200,7 +198,7 @@ class NoteViewModel(application:Application):ViewModel() {
             e.printStackTrace()
         }
     }
-    suspend fun exportNotes(workbook: XSSFWorkbook) {
+    fun exportNotes(workbook: XSSFWorkbook) {
         val sheet = workbook.createSheet("Notes")
 
         //Имена полей для экспорта
