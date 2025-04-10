@@ -3,6 +3,7 @@ package com.example.testapplication.data
 import android.app.Application
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -33,6 +34,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.reflect.Field
+import java.time.LocalDate
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 
 class NoteViewModel(application:Application):ViewModel() {
@@ -262,26 +266,57 @@ class NoteViewModel(application:Application):ViewModel() {
                         if (row.rowNum == 0) {
                             continue
                         }
-                        if (row.getCell(0) == null || row.getCell(0).cellType == CellType.BLANK) {
+                        if ((row.getCell(0) == null
+                                    && row.getCell(1) == null
+                                    && row.getCell(2) == null
+                                    && row.getCell(3) == null)
+                            || (row.getCell(0)!=null && row.getCell(0).cellType == CellType.BLANK)) {
                             break
                         }
-                        val dateStr = row.getCell(0).stringCellValue
-                        val category = row.getCell(1).stringCellValue
-                        val description = row.getCell(2).stringCellValue
-                        val sum = row.getCell(3).stringCellValue
-                        repository.addNote(
-                            Note(
-                                date = dateStr,
-                                category = category,
-                                description = description,
-                                sum = sum
+
+                        val dateStr:String = try {
+                            row.getCell(0).stringCellValue
+                        }catch (e:Exception){
+                            ""
+                        }
+                        val category = try{
+                            row.getCell(1).stringCellValue
+                        }catch (e:Exception){
+                            ""
+                        }
+                        val description:String = try {
+                            row.getCell(2).stringCellValue
+                        }catch (e:Exception){
+                            ""
+                        }
+                        val sum = try {
+                            row.getCell(3).stringCellValue
+                        }catch (e:Exception){
+                            ""
+                        }
+                        try{
+
+                            LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd.MM.yyyy")).atStartOfDay().toEpochSecond(
+                                ZoneOffset.UTC)
+                            repository.addNote(
+                                Note(
+                                    date = dateStr,
+                                    category = category,
+                                    description = description,
+                                    sum = sum
+                                )
                             )
-                        )
+                        }catch (e:Exception){
+
+                            continue
+                        }
+
                     }
                 }
             }
             return true
         }catch (e:Exception){
+
             return false
         }
     }

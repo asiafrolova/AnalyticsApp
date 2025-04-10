@@ -116,13 +116,13 @@ fun MainScreen(navController: NavController, vm: NoteViewModel = viewModel(), in
         mutableStateOf(false)
     }
     val result = remember { mutableStateOf<Uri?>(null) }
+    //  Изменение статуса уведомление об ошибке
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
             result.value = it
             try {
 
                 val ok=vm.importFromExcel(result.value!!)
-                Log.d("TAG",ok.toString())
                 if(!ok){
                     showSnackbar=true
 
@@ -173,6 +173,7 @@ fun MainScreen(navController: NavController, vm: NoteViewModel = viewModel(), in
                                     fontFamily = jost
                                 )
                             }, onClick = {
+                                //Вызов экспорта данных в Excel
                                 menuExpanded.value = false
                                 when (PackageManager.PERMISSION_GRANTED) {
                                     ContextCompat.checkSelfPermission(
@@ -200,6 +201,7 @@ fun MainScreen(navController: NavController, vm: NoteViewModel = viewModel(), in
                                     fontFamily = jost
                                 )
                             }, onClick = {
+                                //Вызов импорта данных из Excel
                                 menuExpanded.value = false
                                 launcher.launch("*/*")
                             })
