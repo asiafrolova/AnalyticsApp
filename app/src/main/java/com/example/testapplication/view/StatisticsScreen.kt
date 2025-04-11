@@ -1,6 +1,7 @@
 package com.example.testapplication.view
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -82,7 +83,8 @@ fun StatisticsScreen(vm: NoteViewModel = viewModel(),navController: NavControlle
                 vm.getSumInYearIncome(pattern)
             }
             mode="year"
-        }else if(pattern?.subSequence(4,6)=="__"){
+        }else if(pattern?.subSequence(3,5)=="__"){
+
             LaunchedEffect(Unit) {
                 vm.getSumInMonthSpend(pattern)
                 vm.getSumInMonthIncome(pattern)
@@ -95,6 +97,7 @@ fun StatisticsScreen(vm: NoteViewModel = viewModel(),navController: NavControlle
             }
             mode="day"
         }
+
 
 
             //Отображение графиков, если данных нет отображение Text("Данных нет")

@@ -1,5 +1,6 @@
 package com.example.testapplication.data
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import com.example.testapplication.data.entities.CategorySum
 import com.example.testapplication.data.entities.DaySum
